@@ -258,6 +258,8 @@ void cmCTestLaunch::RunChild()
               std::ios::out | std::ios::binary);
     }
 
+  double startTime = cmSystemTools::GetTime();
+
   // Run the real command.
   cmsysProcess_Execute(cp);
 
@@ -285,7 +287,9 @@ void cmCTestLaunch::RunChild()
 
   // Wait for the real command to finish.
   cmsysProcess_WaitForExit(cp, 0);
+
   this->ExitCode = cmsysProcess_GetExitValue(cp);
+  this->ExecutionTime = cmSystemTools::GetTime() - startTime;
 }
 
 //----------------------------------------------------------------------------
@@ -298,6 +302,11 @@ int cmCTestLaunch::Run()
     }
 
   this->RunChild();
+
+  if(!this->Passthru)
+    {
+    this->WriteProcessStatsXMLFragment();
+    }
 
   if(this->CheckResults())
     {
@@ -595,6 +604,26 @@ void cmCTestLaunch::DumpFileToXML(std::ostream& fxml,
     fxml << sep << cmXMLSafe(line).Quotes(false);
     sep = "\n";
     }
+}
+
+//----------------------------------------------------------------------------
+void cmCTestLaunch::WriteProcessStatsXMLFragment()
+{
+  std::string logXML = this->LogDir;
+  logXML += "stats-";
+  logXML += this->LogHash;
+  logXML += ".xml";
+
+  cmGeneratedFileStream fxml(logXML.c_str());
+  fxml << "\t<Process targetName='" <<
+    cmXMLSafe(this->OptionTargetName) <<
+    "' sourceFile='" <<
+    cmXMLSafe(this->OptionSource) << "'>\n";
+
+  fxml << "\t\t<Stat key='ElapsedRealTime' value='" <<
+    this->ExecutionTime << "'/>\n";
+
+  fxml << "\t</Process>\n";
 }
 
 //----------------------------------------------------------------------------

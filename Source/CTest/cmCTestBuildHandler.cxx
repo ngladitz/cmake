@@ -527,6 +527,10 @@ int cmCTestBuildHandler::ProcessHandler()
   if(this->UseCTestLaunch)
     {
     this->GenerateXMLLaunched(xofs);
+    if(!this->CreateProcessStatsXML())
+      {
+      return -1;
+      }
     }
   else
     {
@@ -772,6 +776,58 @@ bool cmCTestBuildHandler::IsLaunchedWarningFile(const char* fname)
 {
   // warning-{hash}.xml
   return (cmHasLiteralPrefix(fname, "warning-") &&
+          strcmp(fname+strlen(fname)-4, ".xml") == 0);
+}
+
+//----------------------------------------------------------------------------
+bool cmCTestBuildHandler::CreateProcessStatsXML()
+{
+  cmGeneratedFileStream xofs;
+  if(!this->StartResultingXML(cmCTest::PartBuild, "ProcessStats", xofs))
+    {
+    cmCTestLog(this->CTest, ERROR_MESSAGE,
+      "Cannot create process stats XML file"
+      << std::endl);
+    return false;
+    }
+
+  xofs << "<ProcessStats>\n";
+
+  cmsys::Directory launchDir;
+  launchDir.Load(this->CTestLaunchDir.c_str());
+  unsigned long n = launchDir.GetNumberOfFiles();
+  for(unsigned long i = 0; i < n; ++i)
+    {
+    const char* fname = launchDir.GetFile(i);
+    if(this->IsLaunchedStatsFile(fname))
+      {
+      std::string fullPath = this->CTestLaunchDir + "/" + fname;
+      this->AppendProcessStatsFragment(xofs, fullPath.c_str());
+      }
+    }
+
+  xofs << "</ProcessStats>\n";
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void cmCTestBuildHandler::AppendProcessStatsFragment(
+  std::ostream& os, const char* fname)
+{
+  std::ifstream fin(fname, std::ios::in | std::ios::binary);
+  std::string line;
+  while(cmSystemTools::GetLineFromStream(fin, line))
+    {
+    os << line << "\n";
+    }
+}
+
+//----------------------------------------------------------------------------
+bool cmCTestBuildHandler::IsLaunchedStatsFile(const char* fname)
+{
+  // info-{hash}.xml
+  return (cmHasLiteralPrefix(fname, "stats-") &&
           strcmp(fname+strlen(fname)-4, ".xml") == 0);
 }
 

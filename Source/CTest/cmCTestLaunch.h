@@ -64,6 +64,7 @@ private:
   bool Passthru;
   struct cmsysProcess_s* Process;
   int ExitCode;
+  double ExecutionTime;
 
   // Temporary log files for stdout and stderr of real command.
   std::string LogDir;
@@ -96,6 +97,8 @@ private:
   void WriteXMLResult(std::ostream& fxml);
   void WriteXMLLabels(std::ostream& fxml);
   void DumpFileToXML(std::ostream& fxml, std::string const& fname);
+
+  void WriteProcessStatsXMLFragment();
 
   // Configuration
   void LoadConfig();

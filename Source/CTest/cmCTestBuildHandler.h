@@ -92,6 +92,10 @@ private:
   bool IsLaunchedErrorFile(const char* fname);
   bool IsLaunchedWarningFile(const char* fname);
 
+  bool CreateProcessStatsXML();
+  void AppendProcessStatsFragment(std::ostream& os, const char* fname);
+  bool IsLaunchedStatsFile(const char* fname);
+
   std::string             StartBuild;
   std::string             EndBuild;
   double                  StartBuildTime;
