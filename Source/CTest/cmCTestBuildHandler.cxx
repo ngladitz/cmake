@@ -20,6 +20,7 @@
 #include "cmGeneratedFileStream.h"
 #include "cmXMLSafe.h"
 #include "cmFileTimeComparison.h"
+#include "cmXMLParser.h"
 
 //#include <cmsys/RegularExpression.hxx>
 #include <cmsys/Process.h>
@@ -232,6 +233,8 @@ void cmCTestBuildHandler::Initialize()
 
   this->MaxErrors = 50;
   this->MaxWarnings = 50;
+
+  this->AllTargetStats.clear();
 
   this->UseCTestLaunch = false;
 }
@@ -793,6 +796,7 @@ bool cmCTestBuildHandler::CreateProcessStatsXML()
 
   xofs << "<ProcessStats>\n";
 
+  xofs << "\t<!-- Per command statistics -->\n";
   cmsys::Directory launchDir;
   launchDir.Load(this->CTestLaunchDir.c_str());
   unsigned long n = launchDir.GetNumberOfFiles();
@@ -806,15 +810,96 @@ bool cmCTestBuildHandler::CreateProcessStatsXML()
       }
     }
 
+  xofs << "\n";
+  xofs << "\t<!-- Accumulated per target statistics -->\n";
+
+  for(t_AllTargetStats::const_iterator i = AllTargetStats.begin();
+    i != AllTargetStats.end(); ++i)
+    {
+    xofs << "\t<Target name='" << cmXMLSafe(i->first) << "'>\n";
+
+    t_OneTargetStats const& target = i->second;
+
+    for(t_OneTargetStats::const_iterator j = target.begin();
+      j != target.end(); ++j)
+      {
+      xofs << "\t\t<Stat key='" << cmXMLSafe(j->first) << "' value='" <<
+        j->second << "'/>\n";
+      }
+
+    xofs << "\t</Target>\n";
+    }
+
   xofs << "</ProcessStats>\n";
 
   return true;
 }
 
 //----------------------------------------------------------------------------
+class cmCTestBuildHandler::cmCTestProcessStatParser : public cmXMLParser
+{
+public:
+  cmCTestProcessStatParser(cmCTestBuildHandler* handler)
+    {
+    Handler = handler;
+    }
+
+  virtual void EndElement(const char * /* name */)
+    {
+
+    }
+
+  virtual void StartElement(const char *name, const char **atts)
+    {
+      if(strcmp("Process", name) == 0)
+        {
+          targetName.clear();
+          for(size_t i = 0; atts[i]; i += 2)
+            {
+            if(strcmp(atts[i], "targetName") == 0)
+              {
+              targetName = atts[i+1] ? atts[i+1] : "";
+              }
+            }
+        }
+      else if(strcmp("Stat", name) == 0)
+        {
+        if(targetName.empty())
+          {
+          return;
+          }
+
+        std::string key;
+        double value = 0.0;
+        for(size_t i = 0; atts[i]; i += 2)
+          {
+          if(strcmp(atts[i], "key") == 0)
+            {
+            key = atts[i+1] ? atts[i+1] : "";
+            }
+          else if(strcmp(atts[i], "value") == 0)
+            {
+            std::stringstream tmp;
+            tmp << (atts[i+1] ? atts[i+1] : "");
+            tmp >> value;
+            }
+          }
+
+        Handler->AllTargetStats[targetName][key] += value;
+        }
+    }
+
+  cmCTestBuildHandler* Handler;
+  std::string targetName;
+};
+
+//----------------------------------------------------------------------------
 void cmCTestBuildHandler::AppendProcessStatsFragment(
   std::ostream& os, const char* fname)
 {
+  cmCTestProcessStatParser parser(this);
+  parser.ParseFile(fname);
+
   std::ifstream fin(fname, std::ios::in | std::ios::binary);
   std::string line;
   while(cmSystemTools::GetLineFromStream(fin, line))

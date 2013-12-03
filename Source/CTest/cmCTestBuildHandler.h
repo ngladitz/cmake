@@ -19,6 +19,8 @@
 
 #include <cmsys/RegularExpression.hxx>
 
+#include <map>
+
 class cmMakefile;
 
 /** \class cmCTestBuildHandler
@@ -145,6 +147,13 @@ private:
 
   int                                   MaxErrors;
   int                                   MaxWarnings;
+
+  typedef std::map<std::string, double> t_OneTargetStats;
+  typedef std::map<std::string, t_OneTargetStats> t_AllTargetStats;
+
+  class cmCTestProcessStatParser;
+  friend class cmCTestProcessStatParser;
+  t_AllTargetStats AllTargetStats;
 
   bool UseCTestLaunch;
   std::string CTestLaunchDir;
