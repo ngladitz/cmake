@@ -618,7 +618,9 @@ void cmCTestLaunch::WriteProcessStatsXMLFragment()
   fxml << "\t<Process targetName='" <<
     cmXMLSafe(this->OptionTargetName) <<
     "' sourceFile='" <<
-    cmXMLSafe(this->OptionSource) << "'>\n";
+    cmXMLSafe(this->OptionSource) <<
+    "' outputFile='" <<
+    cmXMLSafe(this->OptionOutput) << "'>\n";
 
   fxml << "\t\t<Stat key='ElapsedRealTime' value='" <<
     this->ExecutionTime << "'/>\n";
