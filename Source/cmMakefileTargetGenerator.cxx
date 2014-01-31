@@ -1664,6 +1664,20 @@ void cmMakefileTargetGenerator
 }
 
 //----------------------------------------------------------------------------
+std::string cmMakefileTargetGenerator::GetFeatureSpecificLinkRuleVariable(
+  std::string const& var) const
+{
+  std::string ipoVar = var + "_IPO";
+  if(this->GetFeatureAsBool("INTERPROCEDURAL_OPTIMIZATION") &&
+     this->Makefile->GetDefinition(ipoVar.c_str()))
+    {
+    return ipoVar;
+    }
+
+  return var;
+}
+
+//----------------------------------------------------------------------------
 std::string cmMakefileTargetGenerator::GetLinkRule(const char* linkRuleVar)
 {
   std::string linkRule = this->Makefile->GetRequiredDefinition(linkRuleVar);
@@ -2041,13 +2055,13 @@ void cmMakefileTargetGenerator::AddModuleDefinitionFlag(std::string& flags)
 }
 
 //----------------------------------------------------------------------------
-const char* cmMakefileTargetGenerator::GetFeature(const char* feature)
+const char* cmMakefileTargetGenerator::GetFeature(const char* feature) const
 {
   return this->Target->GetFeature(feature, this->ConfigName);
 }
 
 //----------------------------------------------------------------------------
-bool cmMakefileTargetGenerator::GetFeatureAsBool(const char* feature)
+bool cmMakefileTargetGenerator::GetFeatureAsBool(const char* feature) const
 {
   return cmSystemTools::IsOn(this->GetFeature(feature));
 }

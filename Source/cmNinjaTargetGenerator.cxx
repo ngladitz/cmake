@@ -97,16 +97,31 @@ const char* cmNinjaTargetGenerator::GetConfigName() const
 }
 
 // TODO: Picked up from cmMakefileTargetGenerator.  Refactor it.
-const char* cmNinjaTargetGenerator::GetFeature(const char* feature)
+const char* cmNinjaTargetGenerator::GetFeature(const char* feature) const
 {
   return this->Target->GetFeature(feature, this->GetConfigName());
 }
 
 // TODO: Picked up from cmMakefileTargetGenerator.  Refactor it.
-bool cmNinjaTargetGenerator::GetFeatureAsBool(const char* feature)
+bool cmNinjaTargetGenerator::GetFeatureAsBool(const char* feature) const
 {
   return cmSystemTools::IsOn(this->GetFeature(feature));
 }
+
+// TODO: Picked up from cmMakefileTargetGenerator.  Refactor it.
+std::string cmNinjaTargetGenerator::GetFeatureSpecificLinkRuleVariable(
+  std::string const& var) const
+{
+  std::string ipoVar = var + "_IPO";
+  if(this->GetFeatureAsBool("INTERPROCEDURAL_OPTIMIZATION") &&
+     this->Makefile->GetDefinition(ipoVar.c_str()))
+    {
+    return ipoVar;
+    }
+
+  return var;
+}
+
 
 // TODO: Picked up from cmMakefileTargetGenerator.  Refactor it.
 void cmNinjaTargetGenerator::AddFeatureFlags(std::string& flags,

@@ -140,11 +140,7 @@ void cmMakefileLibraryTargetGenerator::WriteStaticLibraryRules()
     }
   linkRuleVar += "_CREATE_STATIC_LIBRARY";
 
-  if(this->GetFeatureAsBool("INTERPROCEDURAL_OPTIMIZATION") &&
-     this->Makefile->GetDefinition((linkRuleVar+"_IPO").c_str()))
-    {
-    linkRuleVar += "_IPO";
-    }
+  linkRuleVar = this->GetFeatureSpecificLinkRuleVariable(linkRuleVar);
 
   std::string extraFlags;
   this->LocalGenerator->GetStaticLibraryFlags(extraFlags,
@@ -494,6 +490,7 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules
     std::string arCreateVar = "CMAKE_";
     arCreateVar += linkLanguage;
     arCreateVar += "_ARCHIVE_CREATE";
+    arCreateVar = this->GetFeatureSpecificLinkRuleVariable(arCreateVar);
     if(const char* rule = this->Makefile->GetDefinition(arCreateVar.c_str()))
       {
       cmSystemTools::ExpandListArgument(rule, archiveCreateCommands);
@@ -501,6 +498,7 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules
     std::string arAppendVar = "CMAKE_";
     arAppendVar += linkLanguage;
     arAppendVar += "_ARCHIVE_APPEND";
+    arAppendVar = this->GetFeatureSpecificLinkRuleVariable(arAppendVar);
     if(const char* rule = this->Makefile->GetDefinition(arAppendVar.c_str()))
       {
       cmSystemTools::ExpandListArgument(rule, archiveAppendCommands);
@@ -508,6 +506,7 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules
     std::string arFinishVar = "CMAKE_";
     arFinishVar += linkLanguage;
     arFinishVar += "_ARCHIVE_FINISH";
+    arFinishVar = this->GetFeatureSpecificLinkRuleVariable(arFinishVar);
     if(const char* rule = this->Makefile->GetDefinition(arFinishVar.c_str()))
       {
       cmSystemTools::ExpandListArgument(rule, archiveFinishCommands);

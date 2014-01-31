@@ -137,6 +137,9 @@ protected:
   // Append link rule dependencies (objects, etc.).
   void AppendLinkDepends(std::vector<std::string>& depends);
 
+  // Get feature specific link rule variable (e.g. <var>_IPO)
+  std::string GetFeatureSpecificLinkRuleVariable(std::string const& var) const;
+
   // Lookup the link rule for this target.
   std::string GetLinkRule(const char* linkRuleVar);
 
@@ -258,8 +261,8 @@ protected:
   void AddFeatureFlags(std::string& flags, const char* lang);
 
   // Feature query methods.
-  const char* GetFeature(const char* feature);
-  bool GetFeatureAsBool(const char* feature);
+  const char* GetFeature(const char* feature) const;
+  bool GetFeatureAsBool(const char* feature) const;
 
   //==================================================================
   // Convenience routines that do nothing more than forward to
