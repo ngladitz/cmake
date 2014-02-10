@@ -66,12 +66,16 @@ macro(__compiler_gnu lang)
       find_program(CMAKE_GCC_AR NAMES
         "${_CMAKE_TOOLCHAIN_PREFIX}gcc-ar"
         "${_CMAKE_TOOLCHAIN_PREFIX}gcc-ar-${_version}"
+        DOC "gcc provided wrapper for ar which adds the --plugin option"
       )
 
       find_program(CMAKE_GCC_RANLIB NAMES
         "${_CMAKE_TOOLCHAIN_PREFIX}gcc-ranlib"
         "${_CMAKE_TOOLCHAIN_PREFIX}gcc-ranlib-${_version}"
+        DOC "gcc provided wrapper for ranlib which adds the --plugin option"
       )
+
+      mark_as_advanced(CMAKE_GCC_AR CMAKE_GCC_RANLIB)
     endif()
   endif()
 
