@@ -61,11 +61,16 @@ bool cmSetPropertyCommand
     {
     scope = cmProperty::CACHE;
     }
+  else if(*arg == "CPACK")
+    {
+    scope = cmProperty::CPACK;
+    }
   else
     {
     cmOStringStream e;
     e << "given invalid scope " << *arg << ".  "
-      << "Valid scopes are GLOBAL, DIRECTORY, TARGET, SOURCE, TEST, CACHE.";
+      << "Valid scopes are GLOBAL, DIRECTORY, "
+        "TARGET, SOURCE, TEST, CACHE, CPACK.";
     this->SetError(e.str());
     return false;
     }
@@ -135,6 +140,7 @@ bool cmSetPropertyCommand
     case cmProperty::SOURCE_FILE: return this->HandleSourceMode();
     case cmProperty::TEST:        return this->HandleTestMode();
     case cmProperty::CACHE:       return this->HandleCacheMode();
+    case cmProperty::CPACK:       return this->HandleCPackMode();
 
     case cmProperty::VARIABLE:
     case cmProperty::CACHED_VARIABLE:
@@ -486,5 +492,54 @@ bool cmSetPropertyCommand::HandleCacheEntry(cmCacheManager::CacheIterator& it)
     it.SetProperty(name, value);
     }
 
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool cmSetPropertyCommand::HandleCPackMode()
+{
+  cmake* cm = this->Makefile->GetCMakeInstance();
+
+  for(std::set<std::string>::const_iterator i = this->Names.begin();
+      i != this->Names.end(); ++i)
+    {
+    if(cmInstalledFile* file = cm->GetOrCreateInstalledFile(*i))
+      {
+      if(!this->HandleCPack(file))
+        {
+        return false;
+        }
+      }
+    else
+      {
+      cmOStringStream e;
+      e << "given CPACK name that could not be found or created: " << *i;
+      this->SetError(e.str());
+      return false;
+      }
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool cmSetPropertyCommand::HandleCPack(cmInstalledFile* file)
+{
+  // Set or append the property.
+  std::string const& name = this->PropertyName;
+
+  const char *value = this->PropertyValue.c_str();
+  if (this->Remove)
+    {
+    value = 0;
+    }
+
+  if(this->AppendMode)
+    {
+    file->AppendProperty(name, value, this->AppendAsString);
+    }
+  else
+    {
+    file->SetProperty(name, value);
+    }
   return true;
 }

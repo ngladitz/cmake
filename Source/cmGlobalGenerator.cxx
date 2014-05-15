@@ -1269,6 +1269,13 @@ void cmGlobalGenerator::Generate()
     }
   this->SetCurrentLocalGenerator(0);
 
+  if(!this->GenerateCPackPropertiesFile())
+    {
+    this->GetCMakeInstance()->IssueMessage(
+      cmake::FATAL_ERROR, "Could not write cpack properties file.",
+      cmListFileBacktrace());
+    }
+
   for (std::map<std::string, cmExportBuildFileGenerator*>::iterator
       it = this->BuildExportSets.begin(); it != this->BuildExportSets.end();
       ++it)
@@ -3013,4 +3020,43 @@ std::string cmGlobalGenerator::ExpandCFGIntDir(const std::string& str,
                             const std::string& /*config*/) const
 {
   return str;
+}
+
+//----------------------------------------------------------------------------
+bool cmGlobalGenerator::GenerateCPackPropertiesFile()
+{
+  cmake::InstalledFilesMap const& installedFiles =
+    this->CMakeInstance->GetInstalledFiles();
+
+  std::string path = this->CMakeInstance->GetStartOutputDirectory();
+  path += "/CPackProperties.cmake";
+
+  if(!cmSystemTools::FileExists(path.c_str()) && installedFiles.empty())
+    {
+      return true;
+    }
+
+  cmGeneratedFileStream file(path.c_str());
+  file << "# CPack properties\n";
+
+  for(cmake::InstalledFilesMap::const_iterator i = installedFiles.begin();
+    i != installedFiles.end(); ++i)
+    {
+    std::string const& fileName = i->first;
+    cmInstalledFile const& installedFile = i->second;
+    cmPropertyMap const& properties = installedFile.GetProperties();
+    file << "\n# Properties for '" << fileName << "'\n";
+
+    for(cmPropertyMap::const_iterator j = properties.begin();
+      j != properties.end(); ++j)
+      {
+      cmProperty const& property = j->second;
+      file << "set_property(CPACK " <<
+        cmLocalGenerator::EscapeForCMake(fileName) << " PROPERTY " <<
+        cmLocalGenerator::EscapeForCMake(j->first) << " " <<
+        cmLocalGenerator::EscapeForCMake(property.GetValue()) << ")\n";
+      }
+    }
+
+  return true;
 }
