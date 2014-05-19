@@ -1272,7 +1272,7 @@ void cmGlobalGenerator::Generate()
   if(!this->GenerateCPackPropertiesFile())
     {
     this->GetCMakeInstance()->IssueMessage(
-      cmake::FATAL_ERROR, "Could not write cpack properties file.",
+      cmake::FATAL_ERROR, "Could not write CPack properties file.",
       cmListFileBacktrace());
     }
 
@@ -3051,7 +3051,7 @@ bool cmGlobalGenerator::GenerateCPackPropertiesFile()
       j != properties.end(); ++j)
       {
       cmProperty const& property = j->second;
-      file << "set_property(CPACK " <<
+      file << "set_property(INSTALL " <<
         cmLocalGenerator::EscapeForCMake(fileName) << " PROPERTY " <<
         cmLocalGenerator::EscapeForCMake(j->first) << " " <<
         cmLocalGenerator::EscapeForCMake(property.GetValue()) << ")\n";
