@@ -27,14 +27,14 @@ std::string const& cmInstalledFile::GetName() const
 //----------------------------------------------------------------------------
 void cmInstalledFile::SetProperty(const std::string& prop, const char* value)
 {
-  this->Properties.SetProperty(prop, value, cmProperty::CPACK);
+  this->Properties.SetProperty(prop, value, cmProperty::INSTALL);
 }
 
 //----------------------------------------------------------------------------
 void cmInstalledFile::AppendProperty(const std::string& prop,
   const char* value, bool asString)
 {
-  this->Properties.AppendProperty(prop, value, cmProperty::CPACK, asString);
+  this->Properties.AppendProperty(prop, value, cmProperty::INSTALL, asString);
 }
 
 //----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ const char* cmInstalledFile::GetProperty(const std::string& prop) const
 {
   bool chain = false;
   const char *retVal =
-    this->Properties.GetPropertyValue(prop, cmProperty::CPACK, chain);
+    this->Properties.GetPropertyValue(prop, cmProperty::INSTALL, chain);
 
   return retVal;
 }

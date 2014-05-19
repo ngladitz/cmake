@@ -44,6 +44,7 @@
 #include "cmSetCommand.cxx"
 #include "cmSetDirectoryPropertiesCommand.cxx"
 #include "cmSetPropertyCommand.cxx"
+#include "cmInstalledFile.cxx"
 #include "cmSetSourceFilesPropertiesCommand.cxx"
 #include "cmSetTargetPropertiesCommand.cxx"
 #include "cmSetTestsPropertiesCommand.cxx"

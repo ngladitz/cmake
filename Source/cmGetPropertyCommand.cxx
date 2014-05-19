@@ -67,16 +67,16 @@ bool cmGetPropertyCommand
     {
     scope = cmProperty::CACHE;
     }
-  else if(args[1] == "CPACK")
+  else if(args[1] == "INSTALL")
     {
-    scope = cmProperty::CPACK;
+    scope = cmProperty::INSTALL;
     }
   else
     {
     cmOStringStream e;
     e << "given invalid scope " << args[1] << ".  "
       << "Valid scopes are "
-      << "GLOBAL, DIRECTORY, TARGET, SOURCE, TEST, VARIABLE, CACHE, CPACK.";
+      << "GLOBAL, DIRECTORY, TARGET, SOURCE, TEST, VARIABLE, CACHE, INSTALL.";
     this->SetError(e.str());
     return false;
     }
@@ -194,7 +194,7 @@ bool cmGetPropertyCommand
       case cmProperty::TEST:        return this->HandleTestMode();
       case cmProperty::VARIABLE:    return this->HandleVariableMode();
       case cmProperty::CACHE:       return this->HandleCacheMode();
-      case cmProperty::CPACK:       return this->HandleCPackMode();
+      case cmProperty::INSTALL:       return this->HandleInstallMode();
 
       case cmProperty::CACHED_VARIABLE:
         break; // should never happen
@@ -402,11 +402,11 @@ bool cmGetPropertyCommand::HandleCacheMode()
 }
 
 //----------------------------------------------------------------------------
-bool cmGetPropertyCommand::HandleCPackMode()
+bool cmGetPropertyCommand::HandleInstallMode()
 {
   if(this->Name.empty())
     {
-    this->SetError("not given name for CPACK scope.");
+    this->SetError("not given name for INSTALL scope.");
     return false;
     }
 
@@ -421,7 +421,7 @@ bool cmGetPropertyCommand::HandleCPackMode()
   else
     {
     cmOStringStream e;
-    e << "given CPACK name that could not be found or created: "
+    e << "given INSTALL name that could not be found or created: "
       << this->Name;
     this->SetError(e.str());
     return false;

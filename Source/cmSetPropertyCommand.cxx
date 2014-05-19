@@ -61,16 +61,16 @@ bool cmSetPropertyCommand
     {
     scope = cmProperty::CACHE;
     }
-  else if(*arg == "CPACK")
+  else if(*arg == "INSTALL")
     {
-    scope = cmProperty::CPACK;
+    scope = cmProperty::INSTALL;
     }
   else
     {
     cmOStringStream e;
     e << "given invalid scope " << *arg << ".  "
       << "Valid scopes are GLOBAL, DIRECTORY, "
-        "TARGET, SOURCE, TEST, CACHE, CPACK.";
+        "TARGET, SOURCE, TEST, CACHE, INSTALL.";
     this->SetError(e.str());
     return false;
     }
@@ -140,7 +140,7 @@ bool cmSetPropertyCommand
     case cmProperty::SOURCE_FILE: return this->HandleSourceMode();
     case cmProperty::TEST:        return this->HandleTestMode();
     case cmProperty::CACHE:       return this->HandleCacheMode();
-    case cmProperty::CPACK:       return this->HandleCPackMode();
+    case cmProperty::INSTALL:     return this->HandleInstallMode();
 
     case cmProperty::VARIABLE:
     case cmProperty::CACHED_VARIABLE:
@@ -496,7 +496,7 @@ bool cmSetPropertyCommand::HandleCacheEntry(cmCacheManager::CacheIterator& it)
 }
 
 //----------------------------------------------------------------------------
-bool cmSetPropertyCommand::HandleCPackMode()
+bool cmSetPropertyCommand::HandleInstallMode()
 {
   cmake* cm = this->Makefile->GetCMakeInstance();
 
@@ -505,7 +505,7 @@ bool cmSetPropertyCommand::HandleCPackMode()
     {
     if(cmInstalledFile* file = cm->GetOrCreateInstalledFile(*i))
       {
-      if(!this->HandleCPack(file))
+      if(!this->HandleInstall(file))
         {
         return false;
         }
@@ -513,7 +513,7 @@ bool cmSetPropertyCommand::HandleCPackMode()
     else
       {
       cmOStringStream e;
-      e << "given CPACK name that could not be found or created: " << *i;
+      e << "given INSTALL name that could not be found or created: " << *i;
       this->SetError(e.str());
       return false;
       }
@@ -522,7 +522,7 @@ bool cmSetPropertyCommand::HandleCPackMode()
 }
 
 //----------------------------------------------------------------------------
-bool cmSetPropertyCommand::HandleCPack(cmInstalledFile* file)
+bool cmSetPropertyCommand::HandleInstall(cmInstalledFile* file)
 {
   // Set or append the property.
   std::string const& name = this->PropertyName;

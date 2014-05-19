@@ -145,6 +145,7 @@ _cmake_index_objs = {
     'prop_sf':    _cmake_index_entry('source file property'),
     'prop_test':  _cmake_index_entry('test property'),
     'prop_tgt':   _cmake_index_entry('target property'),
+    'prop_inst':  _cmake_index_entry('installed file property'),
     'variable':   _cmake_index_entry('variable'),
     }
 
@@ -272,6 +273,7 @@ class CMakeDomain(Domain):
         'prop_sf':    ObjType('prop_sf',    'prop_sf'),
         'prop_test':  ObjType('prop_test',  'prop_test'),
         'prop_tgt':   ObjType('prop_tgt',   'prop_tgt'),
+        'prop_inst':  ObjType('prop_inst',  'prop_inst'),
         'manual':     ObjType('manual',     'manual'),
     }
     directives = {
@@ -287,6 +289,7 @@ class CMakeDomain(Domain):
         # 'prop_sf':    CMakeObject,
         # 'prop_test':  CMakeObject,
         # 'prop_tgt':   CMakeObject,
+        # 'prop_inst':  CMakeObject,
         # 'manual':     CMakeObject,
     }
     roles = {
@@ -301,6 +304,7 @@ class CMakeDomain(Domain):
         'prop_sf':    CMakeXRefRole(),
         'prop_test':  CMakeXRefRole(),
         'prop_tgt':   CMakeXRefRole(),
+        'prop_inst':  CMakeXRefRole(),
         'manual':     CMakeXRefRole(),
     }
     initial_data = {
