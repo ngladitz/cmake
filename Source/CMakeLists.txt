@@ -240,8 +240,6 @@ set(SRCS
   cmGraphAdjacencyList.h
   cmGraphVizWriter.cxx
   cmGraphVizWriter.h
-  cmInstalledFile.h
-  cmInstalledFile.cxx
   cmInstallGenerator.h
   cmInstallGenerator.cxx
   cmInstallExportGenerator.cxx
