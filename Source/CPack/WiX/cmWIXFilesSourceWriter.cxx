@@ -152,11 +152,11 @@ std::string cmWIXFilesSourceWriter::EmitComponentFile(
 
   if(installedFile)
     {
-    if(installedFile->GetPropertyAsBool("NEVER_OVERWRITE"))
+    if(installedFile->GetPropertyAsBool("CPACK_NEVER_OVERWRITE"))
       {
       AddAttribute("NeverOverwrite", "yes");
       }
-    if(installedFile->GetPropertyAsBool("PERMANENT"))
+    if(installedFile->GetPropertyAsBool("CPACK_PERMANENT"))
       {
       AddAttribute("Permanent", "yes");
       }
