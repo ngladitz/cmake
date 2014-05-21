@@ -809,6 +809,8 @@ ${CMake_BINARY_DIR}/bin/cmake -DDIR=dev -P ${CMake_SOURCE_DIR}/Utilities/Release
     "-DCMAKE_INSTALL_PREFIX:PATH=${MissingInstallInstallDir}")
   list(APPEND TEST_BUILD_DIRS "${CMake_BINARY_DIR}/Tests/MissingInstall")
 
+  ADD_TEST_MACRO(CPackInstallProperties ${CMAKE_CMAKE_COMMAND} -P runtest.cmake)
+
   # By default, run the CPackComponents test if the CTEST_TEST_CPACK
   # option is ON:
   #
