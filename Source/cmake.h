@@ -283,7 +283,9 @@ class cmake
   cmPropertyMap &GetProperties() { return this->Properties; }
 
   ///! Get or create an cmInstalledFile instance and return a pointer to it
-  cmInstalledFile *GetOrCreateInstalledFile(const std::string& name);
+  cmInstalledFile *GetOrCreateInstalledFile(
+    cmMakefile* mf, const std::string& name);
+
   cmInstalledFile const* GetInstalledFile(const std::string& name) const;
 
   InstalledFilesMap const& GetInstalledFiles() const

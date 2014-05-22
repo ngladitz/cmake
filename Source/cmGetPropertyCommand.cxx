@@ -413,10 +413,13 @@ bool cmGetPropertyCommand::HandleInstallMode()
   // Get the installed file.
   cmake* cm = this->Makefile->GetCMakeInstance();
 
-  if(cmInstalledFile* file = cm->GetOrCreateInstalledFile(this->Name))
+  if(cmInstalledFile* file = cm->GetOrCreateInstalledFile(
+    this->Makefile, this->Name))
     {
-    return
-      this->StoreResult(file->GetProperty(this->PropertyName));
+    std::string value;
+    bool isSet = file->GetProperty(this->PropertyName, value);
+
+    return this->StoreResult(isSet ? value.c_str() : 0);
     }
   else
     {

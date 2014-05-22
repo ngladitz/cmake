@@ -28,6 +28,7 @@
 #include "cmGeneratorExpression.h"
 #include "cmGeneratorExpressionEvaluationFile.h"
 #include "cmExportBuildFileGenerator.h"
+#include "cmCPackPropertiesGenerator.h"
 
 #include <cmsys/Directory.hxx>
 #include <cmsys/FStream.hxx>
@@ -3028,6 +3029,11 @@ bool cmGlobalGenerator::GenerateCPackPropertiesFile()
   cmake::InstalledFilesMap const& installedFiles =
     this->CMakeInstance->GetInstalledFiles();
 
+  cmMakefile* mf = this->LocalGenerators[0]->GetMakefile();
+
+  std::vector<std::string> configs;
+  std::string config = mf->GetConfigurations(configs);
+
   std::string path = this->CMakeInstance->GetStartOutputDirectory();
   path += "/CPackProperties.cmake";
 
@@ -3042,20 +3048,12 @@ bool cmGlobalGenerator::GenerateCPackPropertiesFile()
   for(cmake::InstalledFilesMap::const_iterator i = installedFiles.begin();
     i != installedFiles.end(); ++i)
     {
-    std::string const& fileName = i->first;
     cmInstalledFile const& installedFile = i->second;
-    cmPropertyMap const& properties = installedFile.GetProperties();
-    file << "\n# Properties for '" << fileName << "'\n";
 
-    for(cmPropertyMap::const_iterator j = properties.begin();
-      j != properties.end(); ++j)
-      {
-      cmProperty const& property = j->second;
-      file << "set_property(INSTALL " <<
-        cmLocalGenerator::EscapeForCMake(fileName) << " PROPERTY " <<
-        cmLocalGenerator::EscapeForCMake(j->first) << " " <<
-        cmLocalGenerator::EscapeForCMake(property.GetValue()) << ")\n";
-      }
+    cmCPackPropertiesGenerator cpackPropertiesGenerator(
+      mf, installedFile, configs);
+
+    cpackPropertiesGenerator.Generate(file, config, configs);
     }
 
   return true;

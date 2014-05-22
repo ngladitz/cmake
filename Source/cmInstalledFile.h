@@ -12,7 +12,7 @@
 #ifndef cmInstalledFile_h
 #define cmInstalledFile_h
 
-#include "cmPropertyMap.h"
+#include "cmGeneratorExpression.h"
 
 /** \class cmInstalledFile
  * \brief Represents a file intended for installation.
@@ -22,20 +22,62 @@
 class cmInstalledFile
 {
 public:
-  void SetProperty(const std::string& prop, const char *value);
-  void AppendProperty(const std::string& prop,
-                      const char* value,bool asString=false);
-  const char *GetProperty(const std::string& prop) const;
+
+  typedef cmsys::auto_ptr<cmCompiledGeneratorExpression>
+    CompiledGeneratorExpressionPtrType;
+
+  typedef std::vector<cmCompiledGeneratorExpression*>
+    ExpressionVectorType;
+
+  struct Property
+  {
+    Property()
+    {
+
+    }
+
+    ~Property()
+    {
+      for(ExpressionVectorType::iterator i = ValueExpressions.begin();
+        i != ValueExpressions.end(); ++i)
+        {
+        delete *i;
+        }
+    }
+
+    ExpressionVectorType ValueExpressions;
+  };
+
+  typedef std::map<std::string, Property> PropertyMapType;
+
+  cmInstalledFile();
+
+  ~cmInstalledFile();
+
+  void RemoveProperty(const std::string& prop);
+
+  void SetProperty(cmMakefile const* mf,
+    const std::string& prop, const char *value);
+
+  void AppendProperty(cmMakefile const* mf,
+    const std::string& prop, const char* value,bool asString=false);
+
+  bool GetProperty(const std::string& prop, std::string& value) const;
+
   bool GetPropertyAsBool(const std::string& prop) const;
 
-  void SetName(const std::string& name);
+  void SetName(cmMakefile* mf, const std::string& name);
+
   std::string const& GetName() const;
 
-  cmPropertyMap const& GetProperties() const { return this->Properties; }
+  cmCompiledGeneratorExpression const& GetNameExpression() const;
+
+  PropertyMapType const& GetProperties() const { return this->Properties; }
 
 private:
   std::string Name;
-  cmPropertyMap Properties;
+  cmCompiledGeneratorExpression* NameExpression;
+  PropertyMapType Properties;
 };
 
 #endif

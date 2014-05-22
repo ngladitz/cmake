@@ -2287,7 +2287,8 @@ bool cmake::GetPropertyAsBool(const std::string& prop)
   return cmSystemTools::IsOn(this->GetProperty(prop));
 }
 
-cmInstalledFile *cmake::GetOrCreateInstalledFile(const std::string& name)
+cmInstalledFile *cmake::GetOrCreateInstalledFile(
+  cmMakefile* mf, const std::string& name)
 {
   std::map<std::string, cmInstalledFile>::iterator i =
     this->InstalledFiles.find(name);
@@ -2300,7 +2301,7 @@ cmInstalledFile *cmake::GetOrCreateInstalledFile(const std::string& name)
   else
     {
     cmInstalledFile &file = this->InstalledFiles[name];
-    file.SetName(name);
+    file.SetName(mf, name);
     return &file;
     }
 }

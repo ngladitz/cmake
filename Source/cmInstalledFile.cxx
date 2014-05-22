@@ -11,11 +11,33 @@
 ============================================================================*/
 #include "cmInstalledFile.h"
 #include "cmSystemTools.h"
+#include "cmMakefile.h"
 
 //----------------------------------------------------------------------------
-void cmInstalledFile::SetName(const std::string& name)
+cmInstalledFile::cmInstalledFile():
+  NameExpression(0)
 {
+
+}
+
+//----------------------------------------------------------------------------
+cmInstalledFile::~cmInstalledFile()
+{
+  if(NameExpression)
+    {
+    delete NameExpression;
+    }
+}
+
+//----------------------------------------------------------------------------
+void cmInstalledFile::SetName(cmMakefile* mf, const std::string& name)
+{
+  cmListFileBacktrace backtrace;
+  mf->GetBacktrace(backtrace);
+  cmGeneratorExpression ge(backtrace);
+
   this->Name = name;
+  this->NameExpression = ge.Parse(name).release();
 }
 
 //----------------------------------------------------------------------------
@@ -25,30 +47,69 @@ std::string const& cmInstalledFile::GetName() const
 }
 
 //----------------------------------------------------------------------------
-void cmInstalledFile::SetProperty(const std::string& prop, const char* value)
+cmCompiledGeneratorExpression const& cmInstalledFile::GetNameExpression() const
 {
-  this->Properties.SetProperty(prop, value, cmProperty::INSTALL);
+  return *(this->NameExpression);
 }
 
 //----------------------------------------------------------------------------
-void cmInstalledFile::AppendProperty(const std::string& prop,
-  const char* value, bool asString)
+void cmInstalledFile::RemoveProperty(const std::string& prop)
 {
-  this->Properties.AppendProperty(prop, value, cmProperty::INSTALL, asString);
+  this->Properties.erase(prop);
 }
 
 //----------------------------------------------------------------------------
-const char* cmInstalledFile::GetProperty(const std::string& prop) const
+void cmInstalledFile::SetProperty(cmMakefile const* mf,
+  const std::string& prop, const char* value)
 {
-  bool chain = false;
-  const char *retVal =
-    this->Properties.GetPropertyValue(prop, cmProperty::INSTALL, chain);
+  this->RemoveProperty(prop);
+  this->AppendProperty(mf, prop, value);
+}
 
-  return retVal;
+//----------------------------------------------------------------------------
+void cmInstalledFile::AppendProperty(cmMakefile const* mf,
+  const std::string& prop, const char* value, bool /*asString*/)
+{
+  cmListFileBacktrace backtrace;
+  mf->GetBacktrace(backtrace);
+  cmGeneratorExpression ge(backtrace);
+
+  Property& property = this->Properties[prop];
+  property.ValueExpressions.push_back(ge.Parse(value).release());
+}
+
+//----------------------------------------------------------------------------
+bool cmInstalledFile::GetProperty(
+  const std::string& prop, std::string& value) const
+{
+  PropertyMapType::const_iterator i = this->Properties.find(prop);
+  if(i == this->Properties.end())
+    {
+    return false;
+    }
+
+  Property const& property = i->second;
+
+  std::string output;
+  std::string separator;
+
+  for(ExpressionVectorType::const_iterator
+    j = property.ValueExpressions.begin();
+    j != property.ValueExpressions.end(); ++j)
+    {
+    output += separator;
+    output += (*j)->GetInput();
+    separator = ";";
+    }
+
+  value = output;
+  return true;
 }
 
 //----------------------------------------------------------------------------
 bool cmInstalledFile::GetPropertyAsBool(const std::string& prop) const
 {
-  return cmSystemTools::IsOn(this->GetProperty(prop));
+  std::string value;
+  bool isSet = this->GetProperty(prop, value);
+  return isSet && cmSystemTools::IsOn(value.c_str());
 }

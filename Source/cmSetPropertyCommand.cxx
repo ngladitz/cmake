@@ -503,7 +503,8 @@ bool cmSetPropertyCommand::HandleInstallMode()
   for(std::set<std::string>::const_iterator i = this->Names.begin();
       i != this->Names.end(); ++i)
     {
-    if(cmInstalledFile* file = cm->GetOrCreateInstalledFile(*i))
+    if(cmInstalledFile* file = cm->GetOrCreateInstalledFile(
+      this->Makefile, *i))
       {
       if(!this->HandleInstall(file))
         {
@@ -527,19 +528,20 @@ bool cmSetPropertyCommand::HandleInstall(cmInstalledFile* file)
   // Set or append the property.
   std::string const& name = this->PropertyName;
 
+  cmMakefile* mf = this->Makefile;
+
   const char *value = this->PropertyValue.c_str();
   if (this->Remove)
     {
-    value = 0;
+    file->RemoveProperty(name);
     }
-
-  if(this->AppendMode)
+  else if(this->AppendMode)
     {
-    file->AppendProperty(name, value, this->AppendAsString);
+    file->AppendProperty(mf, name, value, this->AppendAsString);
     }
   else
     {
-    file->SetProperty(name, value);
+    file->SetProperty(mf, name, value);
     }
   return true;
 }
