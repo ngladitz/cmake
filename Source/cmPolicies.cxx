@@ -505,6 +505,21 @@ bool cmPolicies::ApplyPolicyVersion(cmMakefile *mf,
 }
 
 //----------------------------------------------------------------------------
+bool cmPolicies::SetAllPoliciesToNew(cmMakefile *mf)
+{
+  for(std::map<cmPolicies::PolicyID,cmPolicy *>::iterator i
+    = this->Policies.begin(); i != this->Policies.end(); ++i)
+    {
+    if (!mf->SetPolicy(i->second->ID, cmPolicies::NEW))
+      {
+      return false;
+      }
+    }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool cmPolicies::GetPolicyDefault(cmMakefile* mf, std::string const& policy,
                                   cmPolicies::PolicyStatus* defaultSetting)
 {

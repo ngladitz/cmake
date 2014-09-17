@@ -139,6 +139,9 @@ public:
   ///! Set a policy level for this listfile
   bool ApplyPolicyVersion(cmMakefile *mf, const char *version);
 
+  ///! Set all policies to NEW
+  bool SetAllPoliciesToNew(cmMakefile *mf);
+
   ///! return a warning string for a given policy
   std::string GetPolicyWarning(cmPolicies::PolicyID id);
 

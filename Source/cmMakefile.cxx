@@ -506,8 +506,21 @@ cmMakefile::IncludeScope::IncludeScope(cmMakefile* mf, const char* fname,
         this->CheckCMP0011 = true;
       case cmPolicies::NEW:
         // NEW behavior is to push a (strong) scope.
+        {
         this->Makefile->PushPolicy();
+        const char* cmakeRoot = this->Makefile->GetDefinition("CMAKE_ROOT");
+        if(cmakeRoot)
+          {
+          std::string rootModulePath = cmakeRoot;
+          rootModulePath += "/Modules";
+
+          if(cmSystemTools::IsSubDirectory(fname, rootModulePath))
+            {
+            this->Makefile->SetAllPoliciesToNew();
+            }
+          }
         break;
+        }
       }
     }
 
@@ -4986,6 +4999,13 @@ bool cmMakefile::SetPolicyVersion(const char *version)
 {
   return this->GetCMakeInstance()->GetPolicies()->
     ApplyPolicyVersion(this,version);
+}
+
+//----------------------------------------------------------------------------
+bool cmMakefile::SetAllPoliciesToNew()
+{
+  return this->GetCMakeInstance()->GetPolicies()->
+    SetAllPoliciesToNew(this);
 }
 
 //----------------------------------------------------------------------------

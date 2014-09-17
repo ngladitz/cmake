@@ -355,6 +355,7 @@ public:
   bool SetPolicy(const char *id, cmPolicies::PolicyStatus status);
   cmPolicies::PolicyStatus GetPolicyStatus(cmPolicies::PolicyID id) const;
   bool SetPolicyVersion(const char *version);
+  bool SetAllPoliciesToNew();
   void RecordPolicies(cmPolicies::PolicyMap& pm);
   //@}
 
