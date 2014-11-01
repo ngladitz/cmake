@@ -410,14 +410,12 @@ cmNinjaTargetGenerator
       deptype = "gcc";
       depfile = "$DEP_FILE";
 
-      const std::string cl = mf->GetDefinition("CMAKE_C_COMPILER") ?
-                        mf->GetSafeDefinition("CMAKE_C_COMPILER") :
-                        mf->GetSafeDefinition("CMAKE_CXX_COMPILER");
-
       cldeps = "\"";
       cldeps += mf->GetSafeDefinition("CMAKE_MAKE_PROGRAM");
-      cldeps += "\" -t msvc -- ";
-      cldeps += "\"" + cl + "\" ";
+      cldeps += "\" -t msvc ";
+      cldeps += "-o \"$DEP_FILE\" ";
+      cldeps += " -- ";
+      flags += " /showIncludes";
       }
     else if (!mf->GetIsSourceFileTryCompile() &&
         (lang == "RC" || mf->IsOn("FORCE_CMCLDEPS")))
