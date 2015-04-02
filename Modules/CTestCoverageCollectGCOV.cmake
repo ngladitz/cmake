@@ -162,12 +162,14 @@ function(ctest_coverage_collect_gcov)
     endif()
 
     foreach(exclude_entry ${CTEST_CUSTOM_COVERAGE_EXCLUDE})
-      if(NOT is_excluded AND source_file MATCHES "${exclude_entry}")
+      if(source_file MATCHES "${exclude_entry}")
         set(is_excluded true)
 
         if(NOT GCOV_QUIET)
           message("Excluding coverage for: ${source_file} which matches ${exclude_entry}")
         endif()
+
+        break()
       endif()
     endforeach()
 
