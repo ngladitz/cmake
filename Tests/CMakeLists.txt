@@ -2350,7 +2350,7 @@ ${CMake_BINARY_DIR}/bin/cmake -DDIR=dev -P ${CMake_SOURCE_DIR}/Utilities/Release
     )
   set_tests_properties(CTestCoverageCollectGCOV PROPERTIES
     PASS_REGULAR_EXPRESSION
-    "PASSED with correct output.*Testing/CoverageInfo/echoargs.gcov")
+    "PASSED with correct output.*Testing/CoverageInfo/main.cpp.gcov")
 
   configure_file(
     "${CMake_SOURCE_DIR}/Tests/CTestTestEmptyBinaryDirectory/test.cmake.in"
