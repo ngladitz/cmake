@@ -703,10 +703,20 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
     // Tar files
     else if (args[1] == "tar" && args.size() > 3)
       {
+      const char* knownFormats[] =
+        {
+        "7zip",
+        "gnutar",
+        "pax",
+        "paxr",
+        "zip"
+        };
+
       std::string flags = args[2];
       std::string outFile = args[3];
       std::vector<std::string> files;
       std::string mtime;
+      std::string format;
       bool doing_options = true;
       for (std::string::size_type cc = 4; cc < args.size(); cc ++)
         {
@@ -726,6 +736,19 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
             std::string const& files_from = arg.substr(13);
             if (!cmTarFilesFrom(files_from, files))
               {
+              return 1;
+              }
+            }
+          else if (cmHasLiteralPrefix(arg, "--format="))
+            {
+            format = arg.substr(9);
+            bool isKnown = std::find(cmArrayBegin(knownFormats),
+              cmArrayEnd(knownFormats), format) != cmArrayEnd(knownFormats);
+
+            if(!isKnown)
+              {
+              cmSystemTools::Error("Unknown -E tar --format= argument: ",
+                format.c_str());
               return 1;
               }
             }
@@ -781,7 +804,7 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
       else if ( flags.find_first_of('c') != flags.npos )
         {
         if ( !cmSystemTools::CreateTar(
-               outFile.c_str(), files, compress, verbose, mtime) )
+               outFile.c_str(), files, compress, verbose, mtime, format) )
           {
           cmSystemTools::Error("Problem creating tar: ", outFile.c_str());
           return 1;
