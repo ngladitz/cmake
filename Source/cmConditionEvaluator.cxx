@@ -703,7 +703,7 @@ bool cmConditionEvaluator::HandleLevel2(cmArgumentList &newArgs,
             {
             std::ostringstream e;
             e << (this->Makefile.GetPolicies()->GetPolicyWarning(
-              cmPolicies::CMP0054)) << "\n";
+              cmPolicies::CMP0061)) << "\n";
             e << "IN_LIST will be interpreted as an operator "
               "when the policy is set to NEW.  "
               "Since the policy is not set the OLD behavior will be used.";
