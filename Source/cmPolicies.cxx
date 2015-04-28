@@ -395,6 +395,11 @@ cmPolicies::cmPolicies()
     CMP0060, "CMP0060",
     "Link libraries by full path even in implicit directories.",
     3,3,0, cmPolicies::WARN);
+
+  this->DefinePolicy(
+    CMP0061, "CMP0061",
+    "Support new IN_LIST if() operator.",
+    3,3,0, cmPolicies::WARN);
 }
 
 cmPolicies::~cmPolicies()
