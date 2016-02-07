@@ -33,3 +33,5 @@ else()
   # Normal documentation build.
   add_subdirectory(Sphinx)
 endif()
+
+add_subdirectory(Release/WiX)

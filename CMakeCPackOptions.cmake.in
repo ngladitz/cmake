@@ -241,9 +241,19 @@ if("${CPACK_GENERATOR}" STREQUAL "WIX")
     "@CMake_SOURCE_DIR@/Utilities/Release/WiX/ui_dialog.jpg"
   )
 
+  if(CPACK_BUILD_CONFIG)
+    set(_WIX_CUSTOM_ACTION_OUTPUT
+      "@CMake_BINARY_DIR@/Utilities/Release/WiX/custom_action_dll-${CPACK_BUILD_CONFIG}.wxs")
+  else()
+    set(_WIX_CUSTOM_ACTION_OUTPUT
+      "@CMake_BINARY_DIR@/Utilities/Release/WiX/custom_action_dll.wxs")
+  endif()
+
   set(CPACK_WIX_EXTRA_SOURCES
     "@CMake_SOURCE_DIR@/Utilities/Release/WiX/install_dir.wxs"
     "@CMake_SOURCE_DIR@/Utilities/Release/WiX/cmake_extra_dialog.wxs"
+    "@CMake_SOURCE_DIR@/Utilities/Release/WiX/cmake_nsis_overwrite_dialog.wxs"
+    "${_WIX_CUSTOM_ACTION_OUTPUT}"
   )
 
   set(CPACK_WIX_UI_REF "CMakeUI_InstallDir")
