@@ -241,9 +241,17 @@ if("${CPACK_GENERATOR}" STREQUAL "WIX")
     "@CMake_SOURCE_DIR@/Utilities/Release/WiX/ui_dialog.jpg"
   )
 
-  if(CPACK_BUILD_CONFIG)
+  set(_WIX_CUSTOM_ACTION_MULTI_CONFIG "@WIX_CUSTOM_ACTION_MULTI_CONFIG@")
+
+  if(_WIX_CUSTOM_ACTION_MULTI_CONFIG)
+    if(CPACK_BUILD_CONFIG)
+      set(_WIX_CUSTOM_ACTION_CONFIG "${CPACK_BUILD_CONFIG}")
+    else()
+      set(_WIX_CUSTOM_ACTION_CONFIG "Release")
+    endif()
+
     set(_WIX_CUSTOM_ACTION_OUTPUT
-      "@CMake_BINARY_DIR@/Utilities/Release/WiX/custom_action_dll-${CPACK_BUILD_CONFIG}.wxs")
+      "@CMake_BINARY_DIR@/Utilities/Release/WiX/custom_action_dll-${_WIX_CUSTOM_ACTION_CONFIG}.wxs")
   else()
     set(_WIX_CUSTOM_ACTION_OUTPUT
       "@CMake_BINARY_DIR@/Utilities/Release/WiX/custom_action_dll.wxs")
