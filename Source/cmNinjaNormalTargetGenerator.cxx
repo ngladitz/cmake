@@ -346,6 +346,11 @@ cmNinjaNormalTargetGenerator
       std::string linkCmdVar = "CMAKE_";
       linkCmdVar += this->TargetLinkLanguage;
       linkCmdVar += "_ARCHIVE_CREATE";
+
+      linkCmdVar = this->GeneratorTarget->
+        GetFeatureSpecificLinkRuleVariable(
+          linkCmdVar, this->GetConfigName());
+
       const char *linkCmd = mf->GetRequiredDefinition(linkCmdVar);
       cmSystemTools::ExpandListArgument(linkCmd, linkCmds);
       }
@@ -353,6 +358,11 @@ cmNinjaNormalTargetGenerator
       std::string linkCmdVar = "CMAKE_";
       linkCmdVar += this->TargetLinkLanguage;
       linkCmdVar += "_ARCHIVE_FINISH";
+
+      linkCmdVar = this->GeneratorTarget->
+        GetFeatureSpecificLinkRuleVariable(
+          linkCmdVar, this->GetConfigName());
+
       const char *linkCmd = mf->GetRequiredDefinition(linkCmdVar);
       cmSystemTools::ExpandListArgument(linkCmd, linkCmds);
       }

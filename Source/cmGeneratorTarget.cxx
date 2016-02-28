@@ -2614,6 +2614,24 @@ void cmGeneratorTarget::GetAppleArchs(const std::string& config,
 
 //----------------------------------------------------------------------------
 std::string
+cmGeneratorTarget::GetFeatureSpecificLinkRuleVariable(std::string const& var,
+                                         std::string const& config) const
+{
+  if(this->GetFeatureAsBool(
+       "INTERPROCEDURAL_OPTIMIZATION", config))
+    {
+    std::string varIPO = var + "_IPO";
+    if(this->Makefile->GetDefinition(varIPO))
+      {
+      return varIPO;
+      }
+    }
+
+  return var;
+}
+
+//----------------------------------------------------------------------------
+std::string
 cmGeneratorTarget::GetCreateRuleVariable(std::string const& lang,
                                          std::string const& config) const
 {
@@ -2622,16 +2640,7 @@ cmGeneratorTarget::GetCreateRuleVariable(std::string const& lang,
     case cmState::STATIC_LIBRARY:
       {
       std::string var = "CMAKE_" + lang + "_CREATE_STATIC_LIBRARY";
-      if(this->GetFeatureAsBool(
-           "INTERPROCEDURAL_OPTIMIZATION", config))
-        {
-        std::string varIPO = var + "_IPO";
-        if(this->Makefile->GetDefinition(varIPO))
-          {
-          return varIPO;
-          }
-        }
-      return var;
+      return this->GetFeatureSpecificLinkRuleVariable(var, config);
       }
     case cmState::SHARED_LIBRARY:
       return "CMAKE_" + lang + "_CREATE_SHARED_LIBRARY";

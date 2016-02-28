@@ -134,15 +134,10 @@ void cmMakefileLibraryTargetGenerator::WriteStaticLibraryRules()
 {
   std::string linkLanguage =
     this->GeneratorTarget->GetLinkerLanguage(this->ConfigName);
-  std::string linkRuleVar = "CMAKE_";
-  linkRuleVar += linkLanguage;
-  linkRuleVar += "_CREATE_STATIC_LIBRARY";
 
-  if(this->GetFeatureAsBool("INTERPROCEDURAL_OPTIMIZATION") &&
-     this->Makefile->GetDefinition(linkRuleVar+"_IPO"))
-    {
-    linkRuleVar += "_IPO";
-    }
+  std::string linkRuleVar =
+    this->GeneratorTarget->GetCreateRuleVariable(
+      linkLanguage, this->ConfigName);
 
   std::string extraFlags;
   this->LocalGenerator->GetStaticLibraryFlags(extraFlags,
@@ -506,6 +501,10 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules
     std::string arCreateVar = "CMAKE_";
     arCreateVar += linkLanguage;
     arCreateVar += "_ARCHIVE_CREATE";
+
+    arCreateVar = this->GeneratorTarget->
+      GetFeatureSpecificLinkRuleVariable(arCreateVar, this->ConfigName);
+
     if(const char* rule = this->Makefile->GetDefinition(arCreateVar))
       {
       cmSystemTools::ExpandListArgument(rule, archiveCreateCommands);
@@ -513,6 +512,10 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules
     std::string arAppendVar = "CMAKE_";
     arAppendVar += linkLanguage;
     arAppendVar += "_ARCHIVE_APPEND";
+
+    arAppendVar = this->GeneratorTarget->
+      GetFeatureSpecificLinkRuleVariable(arAppendVar, this->ConfigName);
+
     if(const char* rule = this->Makefile->GetDefinition(arAppendVar))
       {
       cmSystemTools::ExpandListArgument(rule, archiveAppendCommands);
@@ -520,6 +523,10 @@ void cmMakefileLibraryTargetGenerator::WriteLibraryRules
     std::string arFinishVar = "CMAKE_";
     arFinishVar += linkLanguage;
     arFinishVar += "_ARCHIVE_FINISH";
+
+    arFinishVar = this->GeneratorTarget->
+      GetFeatureSpecificLinkRuleVariable(arFinishVar, this->ConfigName);
+
     if(const char* rule = this->Makefile->GetDefinition(arFinishVar))
       {
       cmSystemTools::ExpandListArgument(rule, archiveFinishCommands);
