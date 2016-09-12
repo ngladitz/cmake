@@ -134,6 +134,13 @@ void cmCTestSVN::NoteOldRevision()
 
 void cmCTestSVN::NoteNewRevision()
 {
+  // Info for root repository
+  this->Repositories.clear();
+  this->Repositories.push_back(SVNInfo(""));
+  this->RootInfo = &(this->Repositories.back());
+  // Info for the external repositories
+  this->LoadExternals();
+
   // Get info for the external repositories
   std::list<SVNInfo>::iterator itbeg = this->Repositories.begin();
   std::list<SVNInfo>::iterator itend = this->Repositories.end();
